@@ -1,0 +1,23 @@
+{{ config(materialized='table') }}
+
+WITH cleaned_data AS (
+    SELECT
+        ORDER_ID,
+        CUSTOMER_ID,
+        CONCAT(CUSTOMER_FNAME, ' ', CUSTOMER_LNAME) AS FULL_CUSTOMER_NAME,
+        CUSTOMER_CITY,
+        CUSTOMER_COUNTRY,
+        CUSTOMER_SEGMENT,
+        TRY_TO_DATE(ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+        TRY_TO_DATE(SHIPPING_DATE, 'YYYY-MM-DD') AS SHIPPING_DATE,
+        SALES,
+        BENEFIT_PER_ORDER,
+        LATE_DELIVERY_RISK,
+        DELIVERY_STATUS
+    FROM {{ source('analytics', 'DATA') }}
+    WHERE ORDER_ID IS NOT NULL
+      AND CUSTOMER_ID IS NOT NULL
+)
+
+SELECT *
+FROM cleaned_data
